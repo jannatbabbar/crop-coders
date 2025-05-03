@@ -1,45 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useFarmer } from '../context/FarmerContext';
 
 export default function LoanRecommendations() {
-  // Mock data
-  const farmer = {
-    name: 'Ravi Kumar',
-    location: 'Maharashtra, India',
-    recommendedLoanRange: '₹50,000 – ₹2,00,000',
-    governmentSchemes: [
-      {
-        name: 'Kisan Credit Card (KCC)',
-        description: 'Provides timely credit to farmers for their cultivation and other needs with low interest.',
-      },
-      {
-        name: 'PM-KISAN',
-        description: 'Income support scheme for small and marginal farmers offering ₹6,000/year directly to their bank accounts.',
-      },
-      {
-        name: 'NABARD Agriculture Loan',
-        description: 'Refinancing support for banks providing loans to farmers for farm development and allied activities.',
-      },
-    ],
-  };
+  const [loanRecommendation, setLoanRecommendation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const farmerId = useFarmer.farmerId;
+
+  useEffect(() => {
+    const fetchLoanRecommendation = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/cpu/get-loan-recommendation', {
+          farmer_id: farmerId,
+        });
+
+        if (response.status === 200) {
+          const { loan_type, interest_rate, recommended_amount } = response.data;
+          setLoanRecommendation({
+            loanType: loan_type,
+            interestRate: interest_rate,
+            recommendedAmount: recommended_amount,
+          });
+        } else {
+          setError('Failed to fetch loan recommendations');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching the loan recommendations');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (farmerId) {
+      fetchLoanRecommendation();
+    } else {
+      setLoading(false);
+      setError('Farmer ID is missing');
+    }
+  }, [farmerId]);
 
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>Loan Recommendations</h2>
-      <div style={styles.card}>
-        <p><strong>Name:</strong> {farmer.name}</p>
-        <p><strong>Location:</strong> {farmer.location}</p>
-        <p><strong>Recommended Loan Range:</strong> <span style={styles.range}>{farmer.recommendedLoanRange}</span></p>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p style={{ color: 'red' }}>{error}</p>
+      ) : (
+        <div style={styles.card}>
+          <p><strong>Loan Type:</strong> {loanRecommendation?.loanType}</p>
+          <p><strong>Recommended Interest Rate:</strong> {loanRecommendation?.interestRate}%</p>
+          <p><strong>Recommended Loan Amount:</strong> <span style={styles.range}>{loanRecommendation?.recommendedAmount}</span></p>
 
-        <h3 style={styles.subHeading}>Eligible Government Schemes</h3>
-        <ul style={styles.schemeList}>
-          {farmer.governmentSchemes.map((scheme, index) => (
-            <li key={index} style={styles.schemeItem}>
-              <strong>{scheme.name}</strong>
-              <p style={styles.schemeDesc}>{scheme.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+          {/* You can add more details like government schemes, if necessary */}
+        </div>
+      )}
     </div>
   );
 }
@@ -55,11 +72,6 @@ const styles = {
   heading: {
     marginBottom: '20px',
   },
-  subHeading: {
-    marginTop: '30px',
-    fontSize: '18px',
-    textAlign: 'left',
-  },
   card: {
     backgroundColor: '#f9f9f9',
     borderRadius: '10px',
@@ -70,19 +82,5 @@ const styles = {
   range: {
     color: '#007bff',
     fontWeight: 'bold',
-  },
-  schemeList: {
-    listStyleType: 'none',
-    paddingLeft: '0',
-  },
-  schemeItem: {
-    marginBottom: '20px',
-    borderBottom: '1px solid #ddd',
-    paddingBottom: '10px',
-  },
-  schemeDesc: {
-    margin: '5px 0 0',
-    fontSize: '14px',
-    color: '#555',
   },
 };

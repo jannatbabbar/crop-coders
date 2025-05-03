@@ -1,25 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useFarmer } from '../context/FarmerContext.jsx';
 
 export default function FarmerCreditScore() {
-  // Mock data
-  const farmer = {
-    name: 'Ravi Kumar',
-    location: 'Maharashtra, India',
-    creditScore: 728,
-    rating: 'Good',
-    lastUpdated: 'April 28, 2025',
-  };
+  const [creditScore, setCreditScore] = useState(null);
+  const [rating, setRating] = useState('N/A');
+  const [lastUpdated, setLastUpdated] = useState('N/A');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const farmerId = useFarmer.farmerId;
+
+  // Fetch credit score when component mounts
+  useEffect(() => {
+    const fetchCreditScore = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/cpu/get-credit-score', {
+          farmer_id: farmerId,
+        });
+  
+        if (response.status === 200) {
+          const { credit_score } = response.data;
+  
+          // Set the rating based on the new credit score ranges
+          let rating;
+          if (credit_score > 800) {
+            rating = 'Excellent Credit Score';
+          } else if (credit_score >= 740 && credit_score <= 799) {
+            rating = 'Very Good Credit Score';
+          } else if (credit_score >= 670 && credit_score <= 739) {
+            rating = 'Good Credit Score';
+          } else if (credit_score >= 580 && credit_score <= 669) {
+            rating = 'Fair Credit Score';
+          } else {
+            rating = 'Credit Score Needs Improvement';
+          }
+  
+          // Update the state
+          setCreditScore(credit_score);
+          setRating(rating);
+          setLastUpdated(new Date().toLocaleDateString());
+        } else {
+          setError('Failed to fetch credit score: Farmer not found');
+        }
+        setLoading(false);
+      } catch (err) {
+        setError('An error occurred while fetching the credit score');
+        setLoading(false);
+      }
+    };
+  
+    fetchCreditScore();
+  }, [farmerId]);
 
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>Farmer Credit Score</h2>
-      <div style={styles.card}>
-        <p><strong>Name:</strong> {farmer.name}</p>
-        <p><strong>Location:</strong> {farmer.location}</p>
-        <p><strong>Credit Score:</strong> <span style={styles.score}>{farmer.creditScore}</span></p>
-        <p><strong>Rating:</strong> {farmer.rating}</p>
-        <p><small>Last Updated: {farmer.lastUpdated}</small></p>
-      </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p style={{ color: 'red' }}>{error}</p>
+      ) : (
+        <div style={styles.card}>
+          <p><strong>Credit Score:</strong> <span style={styles.score}>{creditScore}</span></p>
+          <p><strong>Rating:</strong> {rating}</p>
+          <p><small>Last Updated: {lastUpdated}</small></p>
+        </div>
+      )}
     </div>
   );
 }

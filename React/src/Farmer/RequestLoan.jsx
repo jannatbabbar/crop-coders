@@ -1,20 +1,64 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useFarmer } from '../context/FarmerContext';
 
 export default function LoanRequestForm() {
   const [amount, setAmount] = useState('');
   const [interestRange, setInterestRange] = useState('');
   const [duration, setDuration] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const farmerId = useFarmer.farmerId; 
+
+  const parseInterestRate = (input) => {
+    const matches = input.match(/\d+(\.\d+)?/g); // Extract numbers like 4 or 4.5
+    if (!matches || matches.length === 0) return null;
+    const average = matches.reduce((sum, val) => sum + parseFloat(val), 0) / matches.length;
+    return average.toFixed(2);
+  };
+
+  const parseDurationToMonths = (input) => {
+    input = input.toLowerCase().trim();
+    if (input.includes('year')) {
+      const years = parseFloat(input);
+      return Math.round(years * 12);
+    } else if (input.includes('month')) {
+      return parseInt(input);
+    }
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (!amount || !interestRange || !duration) {
       alert('Please fill all fields.');
       return;
     }
 
-    setSubmitted(true);
+    const parsedInterest = parseInterestRate(interestRange);
+    const parsedDuration = parseDurationToMonths(duration);
+
+    if (!parsedInterest || !parsedDuration || !farmerId) {
+      setError('Invalid input. Please enter valid interest and duration, and ensure farmer is logged in.');
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5000/farmer/request-loan', {
+        farmer_id: farmerId,
+        amount: parseInt(amount),
+        interest_rate: parseFloat(parsedInterest),
+        duration: parsedDuration,
+      });
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to submit the loan request.');
+    }
   };
 
   return (
@@ -35,7 +79,7 @@ export default function LoanRequestForm() {
           </label>
 
           <label>
-            Preferred Interest Rate Range (%):
+            Maximum Interest Rate:
             <input
               type="text"
               placeholder="e.g. 4% - 8%"
@@ -56,13 +100,15 @@ export default function LoanRequestForm() {
             />
           </label>
 
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
           <button type="submit" style={styles.button}>Submit Request</button>
         </form>
       ) : (
         <div style={styles.summary}>
           <h3>Loan Request Summary</h3>
           <p><strong>Amount:</strong> ₹{amount}</p>
-          <p><strong>Interest Rate Range:</strong> {interestRange}</p>
+          <p><strong>Maximum Interest Rate:</strong> {interestRange}</p>
           <p><strong>Duration:</strong> {duration}</p>
           <p>Your request has been submitted successfully.</p>
         </div>
@@ -71,6 +117,7 @@ export default function LoanRequestForm() {
   );
 }
 
+// Styles remain unchanged
 const styles = {
   container: {
     maxWidth: '500px',

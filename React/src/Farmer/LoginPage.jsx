@@ -1,82 +1,86 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
+import './LoginPage.css';
+import { useFarmer } from '../context/FarmerContext.jsx';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+const LoginPage = () => {
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Simple validation
-    if (!email || !password) {
-      setError("Both fields are required.");
-      return;
+  const handleMobileSubmit = async () => {
+    try {
+      await axios.post('http://localhost:5000/cpu/farmer-login', {
+        mobile_number: mobileNumber,
+      });
+      setStep(2);
+      setMessage('OTP sent. Please enter the OTP');
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Error sending OTP');
     }
+  };
 
-    // Mock login logic
-    console.log("Logging in with", { email, password });
-
-    // Clear form (optional)
-    setEmail("");
-    setPassword("");
-    setError("");
+  const handleOtpSubmit = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/cpu/farmer-verify-otp', {
+        mobile_number: mobileNumber,
+        otp: otp,
+      });
+      const { token, farmer_id } = response.data;
+      setMessage(`Login successful! Farmer ID: ${farmer_id}`);
+      useFarmer.setFarmerId(farmer_id);
+      navigate('/farmer/dashboard');
+    } catch (error) {
+      setMessage(error.response?.data?.error || 'Invalid OTP');
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-        />
-        {error && <p style={styles.error}>{error}</p>}
-        <button type="submit" style={styles.button}>Login</button>
-      </form>
+    <div className="login-container">
+      <h2 className="login-title">Farmer Login</h2>
+
+      {step === 1 && (
+        <div>
+          <label className="login-label">Mobile Number</label>
+          <input
+            type="text"
+            className="login-input"
+            value={mobileNumber}
+            onChange={(e) => setMobileNumber(e.target.value)}
+            placeholder="Enter mobile number"
+          />
+          <button
+            onClick={handleMobileSubmit}
+            className="login-button send-otp-btn"
+          >
+            Send OTP
+          </button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div>
+          <label className="login-label">OTP</label>
+          <input
+            type="text"
+            className="login-input"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="Enter OTP"
+          />
+          <button
+            onClick={handleOtpSubmit}
+            className="login-button verify-otp-btn"
+          >
+            Verify OTP
+          </button>
+        </div>
+      )}
+
+      {message && <p className="login-message">{message}</p>}
     </div>
   );
-}
-
-const styles = {
-  container: {
-    width: "300px",
-    margin: "100px auto",
-    padding: "20px",
-    border: "1px solid #ccc",
-    borderRadius: "10px",
-    textAlign: "center",
-    fontFamily: "sans-serif"
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px"
-  },
-  input: {
-    padding: "10px",
-    fontSize: "16px"
-  },
-  button: {
-    padding: "10px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer"
-  },
-  error: {
-    color: "red",
-    fontSize: "14px"
-  }
 };
+
+export default LoginPage;

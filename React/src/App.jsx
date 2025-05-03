@@ -19,30 +19,37 @@ function App() {
     duration: '24 months',
   };
   return (
-    
-    <Router>
-      <Routes>
-        <Route path="/" element={<FarmerLanding />} />
-        <Route path="/credit-score" element={<CreditScore />} />
-        <Route path="/loan-recommendations" element={<LoanRecommendations />} />
-        <Route path="/view-offers" element={<LoanOffers />} />
-        <Route path="/request-loan" element={<RequestLoan />} />
-        {/* Add more routes as needed */}
-      </Routes>
-    </Router>
+  //   <Router>
+  //   <Routes>
+  //     <Route path="/" element={<LoginPage />} />
 
-    // <div>
-    //   <div>
-    //   {/* <LoanRequestView request={loanRequest} /> */}
-    // </div>
-    //   {/* <LoanOffers /> */}
-    //   {/* <LoanRequests /> */}
-    //   {/* <RequestLoan /> */}
-    //   {/* <LoanRecommendations /> */}
-    //   {/* <CreditScore /> */}
-    //   <FarmerLanding />
-    //   {/* <LoginPage /> */}
-    // </div>
+  //     {/* Wrap only Farmer-specific routes with the FarmerProvider */}
+  //     <Route
+  //       path="/farmer/*"
+  //       element={
+  //         <FarmerProvider>
+  //           <Routes>
+  //             <Route path="dashboard" element={<FarmerLanding />} />
+  //             <Route path="credit-score" element={<CreditScore />} />
+  //             <Route path="loan-recommendations" element={<LoanRecommendations />} />
+  //             <Route path="view-offers" element={<LoanOffers />} />
+  //             <Route path="request-loan" element={<RequestLoan />} />
+  //           </Routes>
+  //         </FarmerProvider>
+  //       }
+  //     />
+  //   </Routes>
+  // </Router>
+
+    <div>
+      {/* <LoanOffers /> */}
+      <LoanRequests /> 
+      {/* <RequestLoan /> */}
+      {/* <LoanRecommendations /> */}
+      {/* <CreditScore /> */}
+      {/* <FarmerLanding /> */}
+    {/* <LoginPage />  */}
+    </div>
       
   )
 }

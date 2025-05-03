@@ -1,38 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoanOfferView from './LoanOfferView';
+import { useFarmer } from '../context/FarmerContext';
 
 export default function LoanOffers() {
-  const [offers, setOffers] = useState([
-    {
-      id: 1,
-      lenderName: 'Ms Pooja Sharma',
-      lenderLocation: 'Delhi',
-      amount: '75000',
-      interestRate: '6%',
-      duration: '18 months',
-    },
-    {
-      id: 2,
-      lenderName: 'Mr Ashok Singh',
-      lenderLocation: 'Bangalore',
-      amount: '100000',
-      interestRate: '5.5%',
-      duration: '24 months',
-    },
-    {
-      id: 3,
-      lenderName: 'Mr Venkatesh Gopal',
-      lenderLocation: 'Lucknow',
-      amount: '50000',
-      interestRate: '7%',
-      duration: '12 months',
-    },
-  ]);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Replace this with the actual farmer ID as needed
+  const farmerId = useFarmer.farmerId;
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/farmer/view-offers?farmer_id=${farmerId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const formatted = data.map((offer) => ({
+          id: offer.offer_id,
+          lenderName: offer.lender_name,
+          amount: offer.amount,
+          interestRate: `${offer.interest_rate}%`,
+          duration: `${offer.duration} months`,
+        }));
+        setOffers(formatted);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching loan offers:', error);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Your Loan Offers</h2>
-      {offers.length === 0 ? (
+      {loading ? (
+        <p style={styles.message}>Loading offers...</p>
+      ) : offers.length === 0 ? (
         <p style={styles.message}>No offers available at the moment.</p>
       ) : (
         offers.map((offer) => (
