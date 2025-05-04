@@ -8,25 +8,15 @@ export default function LoanRequestForm() {
   const [duration, setDuration] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const {farmerId} = useFarmer();
 
-  const farmerId = useFarmer.farmerId; 
 
   const parseInterestRate = (input) => {
-    const matches = input.match(/\d+(\.\d+)?/g); // Extract numbers like 4 or 4.5
-    if (!matches || matches.length === 0) return null;
-    const average = matches.reduce((sum, val) => sum + parseFloat(val), 0) / matches.length;
-    return average.toFixed(2);
+    return input;
   };
 
   const parseDurationToMonths = (input) => {
-    input = input.toLowerCase().trim();
-    if (input.includes('year')) {
-      const years = parseFloat(input);
-      return Math.round(years * 12);
-    } else if (input.includes('month')) {
-      return parseInt(input);
-    }
-    return null;
+    return input
   };
 
   const handleSubmit = async (e) => {
@@ -47,12 +37,13 @@ export default function LoanRequestForm() {
     }
 
     try {
-      await axios.post('http://localhost:5000/farmer/request-loan', {
+      const response = await axios.post('http://164.52.192.217:5000/farmer/request-loan', {
         farmer_id: farmerId,
         amount: parseInt(amount),
         interest_rate: parseFloat(parsedInterest),
         duration: parsedDuration,
       });
+      console.log(response);
 
       setSubmitted(true);
     } catch (err) {

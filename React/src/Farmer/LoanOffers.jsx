@@ -1,33 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import LoanOfferView from './LoanOfferView';
 import { useFarmer } from '../context/FarmerContext';
+import axios from 'axios';
 
 export default function LoanOffers() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Replace this with the actual farmer ID as needed
-  const farmerId = useFarmer.farmerId;
+  const {farmerId} = useFarmer();
 
   useEffect(() => {
-    fetch(`http://localhost:5000/farmer/view-offers?farmer_id=${farmerId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const formatted = data.map((offer) => ({
+    const fetchOffers = async () => {
+      try {
+        const response = await axios.post(
+          'http://164.52.192.217:5000/farmer/view-offers',
+          { farmer_id: farmerId }
+        );
+        const data = response.data.map((offer) => ({
           id: offer.offer_id,
           lenderName: offer.lender_name,
           amount: offer.amount,
           interestRate: `${offer.interest_rate}%`,
           duration: `${offer.duration} months`,
+          lender_id: offer.lender_id
         }));
-        setOffers(formatted);
+        setOffers(data);
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching loan offers:', error);
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchOffers();
+  }, [farmerId]);
+
+  if (loading) {
+    return <p>Loading loan offers...</p>;
+  }
+
+  if (offers.length === 0) {
+    return <p>No loan offers available.</p>;
+  }
 
   return (
     <div style={styles.container}>

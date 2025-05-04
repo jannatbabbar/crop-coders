@@ -1,0 +1,9 @@
+body { /* Or a root div like #root if you have one */
+    background-image: url('./images/your-background-image.jpg'); /* Replace with the actual path to your image */
+    background-size: cover; /* Ensures the image covers the entire viewport */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* Optional: Keeps the background fixed while scrolling */
+    min-height: 100vh; /* Ensures the background covers at least the entire viewport height */
+    margin: 0; /* Remove default body margin */
+    font-family: 'Inter', sans-serif;
+  }

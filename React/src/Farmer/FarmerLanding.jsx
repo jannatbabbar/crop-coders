@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Microphone from '../Microphone';
 
 export default function CreditOptions() {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -9,16 +10,16 @@ export default function CreditOptions() {
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     if (option === 'Generate credit score') {
-      navigate('/credit-score'); // <-- navigate to the CreditScore route
+      navigate('/farmer/credit-score'); // <-- navigate to the CreditScore route
     }
     else if (option == 'Loan Recommendations'){
-      navigate('/loan-recommendations');
+      navigate('/farmer/loan-recommendations');
     }
     else if (option == 'Request a Loan'){
-      navigate('/request-loan');
+      navigate('/farmer/request-loan');
     }
     else if (option == 'View Offers'){
-      navigate('/view-offers');
+      navigate('/farmer/view-offers');
     }
   }
 
@@ -58,18 +59,7 @@ export default function CreditOptions() {
         >
           View Loan Offers
         </button>
-        <div style={styles.audioContainer}>
-          <label htmlFor="audio-input" style={styles.audioLabel}>
-            <button style={styles.button}>Record Audio Input</button>
-          </label>
-          <input
-            type="file"
-            id="audio-input"
-            accept="audio/*"
-            style={styles.audioInput}
-            onChange={handleAudioInput}
-          />
-        </div>
+        <Microphone />
       </div>
       {selectedOption && (
         <p style={styles.selectedOption}>

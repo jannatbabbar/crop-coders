@@ -1,0 +1,44 @@
+/* filepath: c:\Users\parigyajain\PragatiFinal\crop-coders-main\crop-coders-main\React\src\HomePage.css */
+body { /* Or a root div like #root if you have one */
+  background-image: url('./images/your-background-image.jpg'); /* Replace with the actual path to your image */
+  background-size: cover; /* Ensures the image covers the entire viewport */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-attachment: fixed; /* Optional: Keeps the background fixed while scrolling */
+  min-height: 100vh; /* Ensures the background covers at least the entire viewport height */
+  margin: 0; /* Remove default body margin */
+}
+.home-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .home-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .home-question {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .home-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .home-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    transition: background-color 0.3s;
+  }
+  
+  .home-button:hover {
+    background-color: #0056b3;
+  }
