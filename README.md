@@ -1,5 +1,5 @@
 # crop-coders -  [Presentation deck ](https://drive.google.com/file/d/1Y1Q-k5jYut5c2DRxnlPvy9Q6bWdNcLCl/view?usp=sharing)
-# AgriCredit Platform: Farmers and Lenders
+# Credit score generation platform for farmers and lenders
  
 A real-world end-to-end system for farmer credit scoring, personalized loan recommendation, lender-farmer marketplace, and AI contract generation, fully integrated with speech-to-text and regional language support.
  
@@ -38,7 +38,7 @@ A real-world end-to-end system for farmer credit scoring, personalized loan reco
 ├── requirements_gpu.txt           # GPU Requirements
 ├── run_server_cpu.sh              # Bash script to run CPU server
 ├── run_server_gpu.sh              # Bash script to run GPU server
-├── README.md                      # This file
+├── dist                           # Deployed and built front end code
 ```
  
 ---
@@ -66,14 +66,14 @@ apt update && apt upgrade -y && apt install unzip git python3-pip python3-venv s
 From your local Windows machine:
  
 ```bash
-scp -i C:\Users\ADMIN\.ssh\your_key C:\Users\ADMIN\Downloads\project_root_final.zip root@<CPU_PUBLIC_IP>:/root/
+scp -i path/to/your/ssh/key path/to/project_root-20250504T184154Z-1-001.zip root@<CPU_PUBLIC_IP>:/root/
 ```
  
 ### Unzip and Navigate
  
 ```bash
-unzip project_root_final.zip
-cd project_root_final
+unzip project_root-20250504T184154Z-1-001.zip
+cd project_root
 ```
  
 ### Setup Python Virtual Environment
@@ -126,14 +126,14 @@ apt update && apt upgrade -y && apt install unzip git python3-pip python3-venv -
 From your local Windows machine:
  
 ```bash
-scp -i C:\Users\ADMIN\.ssh\your_key C:\Users\ADMIN\Downloads\project_root_final.zip root@<GPU_PUBLIC_IP>:/root/
+scp -i path/to/your/ssh/key path/to/project_root-20250504T184154Z-1-001.zip root@<GPU_PUBLIC_IP>:/root/
 ```
  
 ### Unzip and Navigate
  
 ```bash
-unzip project_root_final.zip
-cd project_root_final
+unzip project_root-20250504T184154Z-1-001.zip
+cd project_root
 ```
  
 ### Setup Python Virtual Environment
@@ -164,18 +164,22 @@ python3 api_gpu/app.py
  
 ... (API details remain unchanged) ...
  
----
+--- For LLAMA call, please replace the openRouter endpoint key by your own key. Generate it here - https://openrouter.ai/settings/keys 
  
 # 📣 Deployment Commands Quick Summary
  
 ```bash
 # CPU Node
+# Prepare Database
+python3 db_setup.py
+python3 dummy_seed_data.py
+
 bash run_server_cpu.sh
  
 # GPU Node
 bash run_server_gpu.sh
- 
-# Prepare Database
-python3 db_setup.py
-python3 dummy_seed_data.py
-```
+
+CPU IP: 164.52.192.217
+GPU IP: 164.52.199.30
+
+``` 
