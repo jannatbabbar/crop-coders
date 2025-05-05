@@ -165,6 +165,14 @@ python3 api_gpu/app.py
 ... (API details remain unchanged) ...
  
 --- For LLAMA call, please replace the openRouter endpoint key by your own key. Generate it here - https://openrouter.ai/settings/keys 
+
+```bash
+#GPU Node
+nano scripts/llama integration 
+
+Update the key, close the file and deploy the GPU node. 
+
+```
  
 # 📣 Deployment Commands Quick Summary
  
@@ -181,5 +189,12 @@ bash run_server_gpu.sh
 
 CPU IP: 164.52.192.217
 GPU IP: 164.52.199.30
+
+# Front end deployement/start
+
+# CPU node 
+sudo nginx -t
+sudo systemctl restart nginx (if above call is successful if not, fix any formatting errors in sudo nano /etc/nginx/sites-enabled/agricredit)
+sudo systemctl restart nginx
 
 ``` 
